@@ -13,66 +13,58 @@ from sklearn.model_selection import train_test_split
 
 
 
-test_data = pd.read_csv("https://raw.githubusercontent.com/4GeeksAcademy/Finarosalina_diabetes_machine-learning-py-template/main/data/processed/clean_test.csv")
-train_data = pd.read_csv("https://raw.githubusercontent.com/4GeeksAcademy/Finarosalina_diabetes_machine-learning-py-template/main/data/processed/clean_train.csv")
+base_url = "https://raw.githubusercontent.com/4GeeksAcademy/Finarosalina_diabetes_machine-learning-py-template/main/data/processed/"
+
+X_train2 = pd.read_csv(base_url + "X_train2.csv")
+X_test2 = pd.read_csv(base_url + "X_test2.csv")
+y_train2 = pd.read_csv(base_url + "y_train2.csv")
+y_test2 = pd.read_csv(base_url + "y_test2.csv")
 
 
-test_data.head()
-train_data.head()
+X_train2.head()
 
-X_train=train_data.drop(["Outcome"], axis = 1)
-y_train=train_data["Outcome"]
-X_test=test_data.drop(["Outcome"], axis=1)
-y_test=test_data["Outcome"]
-X_train
-y_train
+X_test2.head()
 
-X_test.to_csv("/workspaces/Finarosalina_Random_Forest_/data/processed/X_test_data")
-X_train.to_csv("/workspaces/Finarosalina_Random_Forest_/data/processed/X_train_data")
+
+
+X_test2.head()
+X_test2.shape
+
+X_train2.to_csv("/workspaces/Finarosalina_Random_Forest_/data/processed/X_train2.csv", index=False)
+X_test2.to_csv("/workspaces/Finarosalina_Random_Forest_/data/processed/X_test2.csv", index=False)
+y_train2.to_csv("/workspaces/Finarosalina_Random_Forest_/data/processed/y_train2.csv", index=False)
+y_test2.to_csv("/workspaces/Finarosalina_Random_Forest_/data/processed/y_test2.csv", index=False)
+
 
 from sklearn.ensemble import RandomForestClassifier
 
-model = RandomForestClassifier(n_estimators=150, max_depth=8, min_samples_split=10, min_samples_leaf=5)
-model.fit(X_train, y_train)
+model = RandomForestClassifier(n_estimators=150, max_depth=5, min_samples_split=10, min_samples_leaf=5)
+model.fit(X_train2, y_train2)
 
 
-import matplotlib.pyplot as plt
-from sklearn import tree
-
-# Crear figura de 2x2
-fig, axis = plt.subplots(2, 2, figsize=(15, 15))
-
-
-tree.plot_tree(model.estimators_[0], ax=axis[0, 0],
-               feature_names=X_train.columns.tolist(),
-               class_names=["0", "1"],
-               filled=True)
-
-tree.plot_tree(model.estimators_[1], ax=axis[0, 1],
-               feature_names=X_train.columns.tolist(),
-               class_names=["0", "1"],
-               filled=True)
-
-tree.plot_tree(model.estimators_[2], ax=axis[1, 0],
-               feature_names=X_train.columns.tolist(),
-               class_names=["0", "1"],
-               filled=True)
-
-tree.plot_tree(model.estimators_[3], ax=axis[1, 1],
-               feature_names=X_train.columns.tolist(),
-               class_names=["0", "1"],
-               filled=True)
-
-plt.tight_layout()
-plt.show()
-
-
-y_pred = model.predict(X_test)
+y_pred = model.predict(X_test2)
 y_pred
 
 from sklearn.metrics import accuracy_score
 
-accuracy_score(y_test, y_pred)
+accuracy_score(y_test2, y_pred)
+
+from sklearn.tree import DecisionTreeClassifier
+
+simple_features = ["Glucose", "BMI", "Age"]  # para poder visualizarlo, lo pinto sólo con 3 variables
+X_simple = X_train2[simple_features]
+
+
+simple_tree = DecisionTreeClassifier(max_depth=3, random_state=42)
+simple_tree.fit(X_simple, y_train2)
+
+plt.figure(figsize=(15, 10))
+tree.plot_tree(simple_tree,
+               feature_names=simple_features,
+               class_names=["0", "1"],
+               filled=True)
+plt.show()
+
 
 from pickle import dump
 model_filename = "/workspaces/Finarosalina_Random_Forest_/models/random_forest_classifier_default_42.sav"
@@ -105,4 +97,3 @@ with open(output_path, 'w', encoding='utf-8') as f:
     f.write("# Código extraído desde explore.ipynb\n\n")
     f.write("\n\n".join(code_cells))
 
-print("✅ Código copiado exitosamente a app.py")
